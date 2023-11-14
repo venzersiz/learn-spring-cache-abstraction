@@ -2,10 +2,10 @@ package learn.cache.jcache;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.Serializable;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import learn.cache.jcache.domain.model.Address;
+import learn.cache.jcache.domain.model.User;
+import learn.cache.jcache.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +19,9 @@ class EhcacheTest {
 
     @Autowired
     CacheManager cacheManager;
+
+    @Autowired
+    UserService userService;
 
     @Test
     void getCache() {
@@ -76,21 +79,26 @@ class EhcacheTest {
         assertThat(cachedUser1.getAddresses().get(1).getName()).isEqualTo("주소2");
     }
 
-    @RequiredArgsConstructor
-    @Getter
-    static class Address implements Serializable {
+    @Test
+    void declarativeAnnotationBasedCaching() {
+        User user = userService.findOne(1L);
+        // 1. 비즈니스 로직
+        // 2. DB 조회
+        // -> 캐쉬에 없어 DB 조회
 
-        private final String name;
-    }
+        assertThat(user.getSeq()).isEqualTo(1L);
+        assertThat(user.getName()).isEqualTo("김백세");
+        assertThat(user.getAddresses().get(0).getName()).isEqualTo("주소1");
+        assertThat(user.getAddresses().get(1).getName()).isEqualTo("주소2");
 
-    @RequiredArgsConstructor
-    @Getter
-    static class User implements Serializable {
+        User cachedUser = userService.findOne(1L);
+        // 1. 비즈니스 로직
+        // -> 캐쉬에 있어 DB 조회 X
+        assertThat(user).isNotEqualTo(cachedUser); // 캐쉬 값을 가져오긴 하는데 인스턴스 주소값이 다르다
 
-        private final Long seq;
-
-        private final String name;
-
-        private final List<Address> addresses;
+        userService.findOne(2L);
+        // 1. 비즈니스 로직
+        // 2. DB 조회
+        // -> 캐쉬에 없어 DB 조회
     }
 }

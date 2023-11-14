@@ -24,4 +24,10 @@
       <offheap unit="MB">1</offheap>
     </resources>
   </cache>
+
+  <cache alias="user">
+    <resources>
+      <offheap unit="MB">1</offheap>
+    </resources>
+  </cache>
 </config>
