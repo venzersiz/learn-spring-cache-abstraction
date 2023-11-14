@@ -1,3 +1,7 @@
 logging:
   level:
     root: info
+
+spring:
+  cache:
+    cache-names: a
