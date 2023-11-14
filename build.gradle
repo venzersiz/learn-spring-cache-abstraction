@@ -16,7 +16,13 @@ repositories {
 dependencies {
     // ~ Cache
     implementation "org.springframework.boot:spring-boot-starter-cache"
-    implementation "org.ehcache:ehcache"
+    implementation("org.ehcache:ehcache") {
+        // ehcache.xml 사용 시 아래 에러 발생하여 설정
+        // java.lang.NoClassDefFoundError: javax/xml/bind/ValidationEventHandler
+        capabilities {
+            requireCapability("org.ehcache:ehcache-jakarta")
+        }
+    }
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testImplementation "org.springframework.boot:spring-boot-starter-test"

@@ -5,3 +5,5 @@ logging:
 spring:
   cache:
     cache-names: a
+    jcache:
+      config: ehcache.xml
